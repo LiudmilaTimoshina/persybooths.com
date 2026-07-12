@@ -1,5 +1,5 @@
 import { gsap } from "gsap";
-import { Draggable } from "gsap/Draggable";
+// import { Draggable } from "gsap/Draggable";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 export function dottedBoothPin() {
@@ -323,21 +323,39 @@ export function indexHeroScroll() {
 	});
 }
 
-export function draggableCardsAnimation() {
-	const cards = document.querySelectorAll('[data-draggable-cards="card"]');
+export async function draggableCardsAnimation() {
+	const cards = document.querySelectorAll(
+		'[data-draggable-cards="card"]'
+	);
 
 	if (!cards.length) return;
 
-	const cardsContainer = document.querySelector('[data-draggable-cards="container"]');
+	const cardsContainer = document.querySelector(
+		'[data-draggable-cards="container"]'
+	);
 
-	let mm = gsap.matchMedia();
+	if (!cardsContainer) return;
+
+	const { Draggable } = await import("gsap/Draggable");
+
+	gsap.registerPlugin(Draggable);
+
+	const mm = gsap.matchMedia();
 
 	mm.add("(min-width: 769px)", () => {
+		const instances = [];
+
 		cards.forEach((card) => {
-			Draggable.create(card, {
+			const createdInstances = Draggable.create(card, {
 				bounds: cardsContainer,
 			});
+
+			instances.push(...createdInstances);
 		});
+
+		return () => {
+			instances.forEach((instance) => instance.kill());
+		};
 	});
 }
 

@@ -1,7 +1,7 @@
 // Importing custom css
 import "./custom-styles.css";
 import { gsap } from "gsap";
-import { Draggable } from "gsap/Draggable";
+// import { Draggable } from "gsap/Draggable";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { DrawSVGPlugin } from "gsap/DrawSVGPlugin";
 
@@ -626,7 +626,7 @@ function faqAnchorScroll() {
 document.addEventListener("DOMContentLoaded", () => {
 	//overlayScrollbar();
 	gsap.registerPlugin(ScrollTrigger);
-	gsap.registerPlugin(Draggable);
+	// gsap.registerPlugin(Draggable);
 	gsap.registerPlugin(DrawSVGPlugin);
 	smoothScroll();
 	nestedLenisScroll();

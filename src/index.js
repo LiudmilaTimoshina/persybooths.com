@@ -48,7 +48,7 @@ import {
 } from "./modules/animations.js";
 import { accordionAnimation } from "./modules/accordion.js";
 import { smoothScroll, nestedLenisScroll, toggleScroll } from "./modules/smoothScroll.js";
-import { overlayScrollbar } from "./modules/scrollbar.js";
+//import { overlayScrollbar } from "./modules/scrollbar.js";
 import { displayCurrentYear, getCartCount } from "./modules/utils.js";
 import { externalVideoPlayer } from "./modules/externalVideoPlayer.js";
 import { productCompare } from "./modules/productCompare.js";
@@ -624,7 +624,7 @@ function faqAnchorScroll() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-	overlayScrollbar();
+	//overlayScrollbar();
 	gsap.registerPlugin(ScrollTrigger);
 	gsap.registerPlugin(Draggable);
 	gsap.registerPlugin(DrawSVGPlugin);

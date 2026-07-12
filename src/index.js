@@ -335,7 +335,7 @@ function mobileMenuAnimation() {
 			});
 		});
 
-		menuTl = gsap.timeline({
+		const menuTl = gsap.timeline({
 			paused: true,
 			onStart: () => {
 				gsap.set(mobileMenu, { display: "block" }); // Ensure display is set to block when animation starts

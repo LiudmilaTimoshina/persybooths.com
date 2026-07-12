@@ -44,27 +44,15 @@ export function nestedLenisScroll() {
 }
 
 export function toggleScroll(disable = false) {
-	if (disable) {
-		window.lenis.stop();
-		osInstance.options({
-			overflow: {
-				x: "hidden", // Disable horizontal scrolling
-				y: "hidden", // Disable vertical scrolling
-			},
-			scrollbars: {
-				visibility: "hidden", // Hide the scrollbars
-			},
-		});
-	} else {
-		window.lenis.start();
-		osInstance.options({
-			overflow: {
-				x: "scroll", // Re-enable horizontal scrolling (if applicable)
-				y: "scroll", // Re-enable vertical scrolling
-			},
-			scrollbars: {
-				visibility: "auto", // Make the scrollbars visible again
-			},
-		});
-	}
+  if (disable) {
+    window.lenis?.stop();
+
+    document.documentElement.style.overflow = "hidden";
+    document.body.style.overflow = "hidden";
+  } else {
+    window.lenis?.start();
+
+    document.documentElement.style.overflow = "";
+    document.body.style.overflow = "";
+  }
 }

@@ -6,7 +6,6 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { DrawSVGPlugin } from "gsap/DrawSVGPlugin";
 
 // Importing JS from /modules
-import { showroomMap, showroomSearch } from "./modules/showroomMap.js";
 import {
 	testimonialsSlider,
 	reasonsSlider,
@@ -51,6 +50,7 @@ import { smoothScroll, nestedLenisScroll, toggleScroll } from "./modules/smoothS
 //import { overlayScrollbar } from "./modules/scrollbar.js";
 import { displayCurrentYear, getCartCount } from "./modules/utils.js";
 import { externalVideoPlayer } from "./modules/externalVideoPlayer.js";
+import { accordionVideo } from "./modules/accordionVideo.js";
 import { productCompare } from "./modules/productCompare.js";
 import { soundCompare } from "./modules/soundCompare.js";
 
@@ -674,8 +674,16 @@ document.addEventListener("DOMContentLoaded", () => {
 	aboutGallerySlider();
 	aboutValuesSlider();
 	aboutCardsExpand();
-	showroomMap();
-	showroomSearch();
+	if (document.body.dataset.loadMaps === "1") {
+		import("./modules/showroomMap.js")
+			.then(({ showroomMap, showroomSearch }) => {
+			showroomMap();
+			showroomSearch();
+			})
+			.catch((error) => {
+			console.error("[Showroom map] Failed to load:", error);
+			});
+	}
 	mobileKnowledgeBlogSlider();
 	knowledgePostGallerySlider();
 	thingsToWatchLandingSlider();
@@ -683,6 +691,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	gallerySlider();
 	initStackingNav();
 	externalVideoPlayer();
+	accordionVideo();
 	productCompare();
 	productCompareSlider();
 	soundCompare();

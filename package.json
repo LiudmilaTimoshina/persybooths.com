@@ -4,8 +4,8 @@
 	"description": "",
 	"main": "index.js",
 	"scripts": {
-		"build": "esbuild src/index.js --bundle --outfile=dist/bundle.js --minify",
-		"watch": "esbuild src/index.js --bundle --outfile=dist/bundle.js --sourcemap --watch"
+	"build": "esbuild src/index.js --bundle --splitting --format=esm --outdir=dist --entry-names=bundle --chunk-names=chunks/[name]-[hash] --minify",
+	"watch": "esbuild src/index.js --bundle --splitting --format=esm --outdir=dist --entry-names=bundle --chunk-names=chunks/[name]-[hash] --sourcemap --watch"
 	},
 	"keywords": [],
 	"author": "",

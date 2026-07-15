@@ -176,12 +176,12 @@ export async function showroomMap() {
 	// Disabling lenis when using CMD + Mousewheel to zoomin/out
 	mapContainer.addEventListener("wheel", (event) => {
 		if (event.ctrlKey || event.metaKey) {
-			lenis.stop();
+			window.lenis?.stop();
 
 			// Wait for the zooming to stop, then re-enable Lenis
 			clearTimeout(window.zoomTimeout);
 			window.zoomTimeout = setTimeout(() => {
-				lenis.start();
+				window.lenis?.start();
 			}, 300); // Adjust delay as needed
 		}
 	});

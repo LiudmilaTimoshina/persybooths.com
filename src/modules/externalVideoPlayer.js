@@ -1,5 +1,7 @@
 export function externalVideoPlayer() {
-	const externalVideos = document.querySelectorAll("[data-external-video-wrap]");
+	const externalVideos = document.querySelectorAll(
+  "[data-external-video-wrap]:not(.design-accordion_video-wrap)"
+);
 
 	if (!externalVideos.length) return;
 

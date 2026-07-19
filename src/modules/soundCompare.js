@@ -1,175 +1,250 @@
 import { gsap } from "gsap";
 
+const TRACK_DURATION = 45;
+
+const OUTSIDE_AUDIO_URL =
+  "https://cdn.prod.website-files.com/6801d6dc5d6eee6b305b8333/68d4f3a55d5e088a819a848b_Persy%20Booths_AMB_45s_No%20Filter_V5.mp3";
+
+const INSIDE_AUDIO_URL =
+  "https://cdn.prod.website-files.com/6801d6dc5d6eee6b305b8333/68d4f3a52d008733491a68fc_Persy%20Booths_AMB_45s_Filter_V5.mp3";
+
 export function soundCompare() {
-	const animationTarget = document.querySelector("[data-sound-animation-target]");
-	if (!animationTarget) return;
+  const animationTarget = document.querySelector(
+    "[data-sound-animation-target]"
+  );
 
-	const outsideNoise = new Audio(
-		"https://cdn.prod.website-files.com/6801d6dc5d6eee6b305b8333/68d4f3a55d5e088a819a848b_Persy%20Booths_AMB_45s_No%20Filter_V5.mp3"
-	);
-	const insideNoise = new Audio("https://cdn.prod.website-files.com/6801d6dc5d6eee6b305b8333/68d4f3a52d008733491a68fc_Persy%20Booths_AMB_45s_Filter_V5.mp3");
+  if (!animationTarget) return;
 
-	if (!outsideNoise || !insideNoise) return;
+  const playButton = animationTarget.querySelector(
+    '[data-sound-play="button"]'
+  );
+  const playIcon = animationTarget.querySelector(
+    '[data-sound-play="icon-play"]'
+  );
+  const pauseIcon = animationTarget.querySelector(
+    '[data-sound-play="icon-pause"]'
+  );
 
-	const audioElements = [outsideNoise, insideNoise];
+  const environmentButtons = animationTarget.querySelectorAll(
+    "[data-sound-environment]"
+  );
+  const environmentActiveBg = animationTarget.querySelector(
+    "[data-sound-active-environment]"
+  );
+  const envControlsWrap = animationTarget.querySelector(
+    ".product-sound_env-controls"
+  );
 
-	// Mute inside noise, because by default we play outside noise
-	insideNoise.muted = true;
+  const outsideNoiseWave = animationTarget.querySelector(
+    '[data-sound-wave="outside"]'
+  );
+  const insideNoiseWave = animationTarget.querySelector(
+    '[data-sound-wave="inside"]'
+  );
 
-	let audioDuration = 0;
-	let loadedMetadataCounter = 0;
+  if (
+    !playButton ||
+    !playIcon ||
+    !pauseIcon ||
+    !environmentActiveBg ||
+    !envControlsWrap ||
+    !outsideNoiseWave ||
+    !insideNoiseWave
+  ) {
+    console.warn("[Sound compare] Required elements are missing.");
+    return;
+  }
 
-	const playButton = animationTarget.querySelector('[data-sound-play="button"]');
-	const playIcon = playButton.querySelector('[data-sound-play="icon-play"]');
-	const pauseIcon = playButton.querySelector('[data-sound-play="icon-pause"]');
+  const outsideNoise = new Audio();
+  const insideNoise = new Audio();
 
-	const environmentButtons = animationTarget.querySelectorAll("[data-sound-environment]");
-	const environmentActiveBg = animationTarget.querySelector("[data-sound-active-environment]");
-	const envControlsWrap = animationTarget.querySelector(".product-sound_env-controls");
+  outsideNoise.preload = "none";
+  insideNoise.preload = "none";
 
-	const outsideNoiseWave = animationTarget.querySelector('[data-sound-wave="outside"]');
-	const insideNoiseWave = animationTarget.querySelector('[data-sound-wave="inside"]');
+  insideNoise.muted = true;
 
-	let isPlaying = false;
-	let currentActiveEnvironment = "outside"; // Track the currently active environment
+  let isPrepared = false;
+  let isPlaying = false;
+  let currentActiveEnvironment = "outside";
+  let resizeTimeout;
 
-	let soundWaveTl;
+  const soundWaveTl = gsap.timeline({ paused: true });
 
-	audioElements.forEach((audio) => {
-		audio.addEventListener("loadedmetadata", () => {
-			if (audio.duration > audioDuration) {
-				audioDuration = audio.duration;
-			}
+  soundWaveTl.fromTo(
+    animationTarget.querySelectorAll(".animated-sound-wave"),
+    {
+      drawSVG: "100% 100%",
+    },
+    {
+      drawSVG: "0% 100%",
+      duration: TRACK_DURATION,
+      ease: "none",
+    }
+  );
 
-			loadedMetadataCounter++;
-			if (loadedMetadataCounter === 2) {
-				createAnimation();
-			}
-		});
-	});
+  function prepareAudio() {
+    if (isPrepared) return;
 
-	function createAnimation() {
-		soundWaveTl = gsap.timeline({ paused: true });
-		soundWaveTl.fromTo(
-			".animated-sound-wave",
-			{
-				drawSVG: "100% 100%",
-			},
-			{
-				drawSVG: "0% 100%",
-				duration: audioDuration,
-				ease: "none",
-			}
-		);
-	}
+    isPrepared = true;
 
-	function toggleEnvironment(environment) {
-		if (environment === "outside") {
-			outsideNoise.muted = false;
-			insideNoise.muted = true;
-			outsideNoiseWave.style.opacity = 100;
-			insideNoiseWave.style.opacity = 0;
-		} else {
-			outsideNoise.muted = true;
-			insideNoise.muted = false;
-			insideNoiseWave.style.opacity = 100;
-			outsideNoiseWave.style.opacity = 0;
-		}
-	}
+    outsideNoise.src = OUTSIDE_AUDIO_URL;
+    insideNoise.src = INSIDE_AUDIO_URL;
 
-	function showPlayIcon() {
-		playIcon.style.display = "flex";
-		pauseIcon.style.display = "none";
-	}
+    outsideNoise.load();
+    insideNoise.load();
+  }
 
-	function showPauseIcon() {
-		playIcon.style.display = "none";
-		pauseIcon.style.display = "flex";
-	}
+  function syncAudioPositions() {
+    const timelineTime = soundWaveTl.time();
 
-	function toggleAudio() {
-		if (isPlaying) {
-			isPlaying = false;
-			showPlayIcon();
-			soundWaveTl.pause();
-			outsideNoise.pause();
-			insideNoise.pause();
-		} else {
-			isPlaying = true;
-			showPauseIcon();
-			soundWaveTl.play();
-			outsideNoise.play();
-			insideNoise.play();
-		}
-	}
+    if (
+      Number.isFinite(outsideNoise.duration) &&
+      Math.abs(outsideNoise.currentTime - timelineTime) > 0.15
+    ) {
+      outsideNoise.currentTime = timelineTime;
+    }
 
-	function handleAudioEnd() {
-		showPlayIcon();
-		isPlaying = false;
-		soundWaveTl.pause();
-		soundWaveTl.progress(0);
-	}
+    if (
+      Number.isFinite(insideNoise.duration) &&
+      Math.abs(insideNoise.currentTime - timelineTime) > 0.15
+    ) {
+      insideNoise.currentTime = timelineTime;
+    }
+  }
 
-	function setEnvironmentActiveBtn(buttonWidth, activeButton) {
-		const wrapRect = envControlsWrap.getBoundingClientRect();
-		const btnRect = activeButton.getBoundingClientRect();
+  function toggleEnvironment(environment) {
+    if (environment === "outside") {
+      outsideNoise.muted = false;
+      insideNoise.muted = true;
 
-		const btnLeft = btnRect.left - wrapRect.left;
+      outsideNoiseWave.style.opacity = "1";
+      insideNoiseWave.style.opacity = "0";
+    } else {
+      outsideNoise.muted = true;
+      insideNoise.muted = false;
 
-		gsap.to(environmentActiveBg, {
-			width: buttonWidth,
-			left: btnLeft,
-			duration: 0.3,
-			ease: "power2.out",
-		});
-	}
+      insideNoiseWave.style.opacity = "1";
+      outsideNoiseWave.style.opacity = "0";
+    }
+  }
 
-	// Handle window resize to adjust active background position
-	function handleResize() {
-		// Find the currently active button based on the environment state
-		const activeButton = document.querySelector(`[data-sound-environment="${currentActiveEnvironment}"]`);
-		if (activeButton) {
-			const buttonWidth = activeButton.offsetWidth;
-			setEnvironmentActiveBtn(buttonWidth, activeButton);
-		}
-	}
+  function showPlayIcon() {
+    playIcon.style.display = "flex";
+    pauseIcon.style.display = "none";
+  }
 
-	// Add resize event listener with debouncing for better performance
-	let resizeTimeout;
-	window.addEventListener("resize", () => {
-		clearTimeout(resizeTimeout);
-		resizeTimeout = setTimeout(handleResize, 100);
-	});
+  function showPauseIcon() {
+    playIcon.style.display = "none";
+    pauseIcon.style.display = "flex";
+  }
 
-	playButton.addEventListener("click", () => {
-		toggleAudio();
-	});
+  async function playAudio() {
+    prepareAudio();
+    syncAudioPositions();
 
-	environmentButtons.forEach((button) => {
-		const environment = button.dataset.soundEnvironment;
-		const buttonWidth = button.offsetWidth;
+    try {
+      await Promise.all([
+        outsideNoise.play(),
+        insideNoise.play(),
+      ]);
 
-		if (environment === "outside") {
-			setEnvironmentActiveBtn(buttonWidth, button);
-		}
+      isPlaying = true;
+      showPauseIcon();
+      soundWaveTl.play();
+    } catch (error) {
+      isPlaying = false;
+      showPlayIcon();
+      soundWaveTl.pause();
 
-		button.addEventListener("click", () => {
-			toggleEnvironment(environment);
-			currentActiveEnvironment = environment; // Update the active environment state
-			const currentButtonWidth = button.offsetWidth; // Get current width, not cached width
-			setEnvironmentActiveBtn(currentButtonWidth, button);
-		});
-	});
+      console.warn("[Sound compare] Audio play failed:", error);
+    }
+  }
 
-	insideNoise.addEventListener("ended", () => {
-		if (outsideNoise.ended) {
-			handleAudioEnd();
-		}
-	});
+  function pauseAudio() {
+    isPlaying = false;
 
-	outsideNoise.addEventListener("ended", () => {
-		if (insideNoise.ended) {
-			handleAudioEnd();
-		}
-	});
+    outsideNoise.pause();
+    insideNoise.pause();
+
+    soundWaveTl.pause();
+    showPlayIcon();
+  }
+
+  function toggleAudio() {
+    if (isPlaying) {
+      pauseAudio();
+      return;
+    }
+
+    playAudio();
+  }
+
+  function resetAudio() {
+    isPlaying = false;
+
+    outsideNoise.pause();
+    insideNoise.pause();
+
+    outsideNoise.currentTime = 0;
+    insideNoise.currentTime = 0;
+
+    soundWaveTl.pause();
+    soundWaveTl.progress(0);
+
+    showPlayIcon();
+  }
+
+  function setEnvironmentActiveBtn(activeButton) {
+    const wrapRect = envControlsWrap.getBoundingClientRect();
+    const btnRect = activeButton.getBoundingClientRect();
+
+    const btnLeft = btnRect.left - wrapRect.left;
+
+    gsap.to(environmentActiveBg, {
+      width: activeButton.offsetWidth,
+      left: btnLeft,
+      duration: 0.3,
+      ease: "power2.out",
+    });
+  }
+
+  function handleResize() {
+    const activeButton = animationTarget.querySelector(
+      `[data-sound-environment="${currentActiveEnvironment}"]`
+    );
+
+    if (activeButton) {
+      setEnvironmentActiveBtn(activeButton);
+    }
+  }
+
+  playButton.addEventListener(
+    "pointerdown",
+    prepareAudio,
+    { once: true }
+  );
+
+  playButton.addEventListener("click", toggleAudio);
+
+  environmentButtons.forEach((button) => {
+    const environment = button.dataset.soundEnvironment;
+
+    if (environment === "outside") {
+      setEnvironmentActiveBtn(button);
+    }
+
+    button.addEventListener("click", () => {
+      toggleEnvironment(environment);
+      currentActiveEnvironment = environment;
+      setEnvironmentActiveBtn(button);
+    });
+  });
+
+  window.addEventListener("resize", () => {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(handleResize, 100);
+  });
+
+  outsideNoise.addEventListener("ended", resetAudio);
+  insideNoise.addEventListener("ended", resetAudio);
 }

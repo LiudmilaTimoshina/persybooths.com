@@ -5,6 +5,8 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { DrawSVGPlugin } from "gsap/DrawSVGPlugin";
 
+gsap.registerPlugin(ScrollTrigger, DrawSVGPlugin);
+
 // Importing JS from /modules
 import {
 	testimonialsSlider,
@@ -625,9 +627,7 @@ function faqAnchorScroll() {
 
 document.addEventListener("DOMContentLoaded", () => {
 	//overlayScrollbar();
-	gsap.registerPlugin(ScrollTrigger);
 	// gsap.registerPlugin(Draggable);
-	gsap.registerPlugin(DrawSVGPlugin);
 	smoothScroll();
 	nestedLenisScroll();
 	$.validator.setDefaults({

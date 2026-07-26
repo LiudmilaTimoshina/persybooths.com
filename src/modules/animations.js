@@ -509,13 +509,14 @@ export function imageParallaxAnimation() {
 	parallaxWraps.forEach((wrap) => {
 		const images = wrap.querySelectorAll("img");
 
-		let tl = gsap.timeline({
-			scrollTrigger: {
-				trigger: wrap,
-				start: "top bottom",
-				end: "bottom top",
-				scrub: true,
-			},
+		let tl = gsap.timeline();
+
+		ScrollTrigger.create({
+		trigger: wrap,
+		start: "top bottom",
+		end: "bottom top",
+		scrub: true,
+		animation: tl,
 		});
 
 		tl.to(images, {

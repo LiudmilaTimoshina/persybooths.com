@@ -2,6 +2,8 @@ import { gsap } from "gsap";
 // import { Draggable } from "gsap/Draggable";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
+gsap.registerPlugin(ScrollTrigger);
+
 export function dottedBoothPin() {
 	const dots = document.querySelector('[data-dots-pin="image"]');
 	if (!dots) return;

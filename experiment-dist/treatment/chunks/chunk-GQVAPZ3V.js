@@ -1,0 +1,1 @@
+var e=window.gsap,r=window.ScrollTrigger;if(e?.version!=="3.15.0"||r?.version!=="3.15.0")throw new Error("[Persy GSAP experiment] Expected Webflow GSAP and ScrollTrigger 3.15.0. Restore the baseline bundle.");export{e as a,r as b};

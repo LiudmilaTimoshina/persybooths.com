@@ -24,6 +24,10 @@ The standard production build does not include Header v2. A future production re
 
 ## Rollback
 
-Restore each site's saved Head/Footer Custom Code and each enrolled page's saved Before-body block, then publish staging only. Restore UK sandbox page Head as well if reverting to its former page-local CSS. Do not combine the new bundle with the old inline runtime. Keep production domain unchecked.
+COM: restore saved site Head/Footer Custom Code and the saved Before-body blocks for Sustainability, Persy One, and Blog & Articles categories. Publish staging only.
+
+UK: restore saved site Head/Footer Custom Code. This restores one inline v2 runtime and critical CSS in the global Head, so keep sandbox's cleaned page Head (noindex only) and Before-body block (Contact Form only). Do not also restore sandbox's old duplicate runtime/CSS. Publish staging only.
+
+Do not combine the new bundle with the old inline runtime. Keep production domains unchecked.
 
 The surrounding task output folder contains the exact pre-change Webflow code, QA results, and screenshots. No form submissions are included in QA.

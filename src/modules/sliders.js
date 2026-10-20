@@ -601,6 +601,9 @@ export function productCompareSlider() {
 	if (!swiperTargets.length) return;
 
 	swiperTargets.forEach((target) => {
+		// Localized CMS fallbacks can render an empty collection without its wrapper.
+		// Swiper requires that wrapper; skip empty targets so site initialization continues.
+		if (!target.querySelector('.swiper-wrapper')) return;
 		const swiper = new Swiper(target, {
 			slidesPerView: 1.05,
 			speed: 800,

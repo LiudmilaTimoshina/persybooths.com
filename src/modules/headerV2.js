@@ -1,6 +1,8 @@
 import { gsap } from 'gsap';
 
-const STAGING_HOSTS = new Set([
+const ENABLED_HOSTS = new Set([
+  'www.persybooths.com',
+  'persybooths.com',
   'persybooths-uk.webflow.io',
   'persybooths-com-a171e119102a6875fb6aff4.webflow.io',
 ]);
@@ -323,12 +325,12 @@ function initA11y(component) {
 
 
 export function initHeaderV2() {
-  if (!STAGING_HOSTS.has(location.hostname)) return;
+  if (!ENABLED_HOSTS.has(location.hostname)) return;
   document.querySelectorAll('header[data-pb-header="v2"]').forEach(component => {
     initMenu(component);
     initLocale(component);
     initFormEscape(component);
     initA11y(component);
   });
-  window.PersyHeaderV2 = Object.freeze({ version: '1.1.0-staging', init: initHeaderV2 });
+  window.PersyHeaderV2 = Object.freeze({ version: '1.1.1', init: initHeaderV2 });
 }

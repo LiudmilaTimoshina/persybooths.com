@@ -25,8 +25,8 @@ function environment(hostname, roots) {
   return { context, queries: () => domQueries, init: () => vm.runInContext('initHeaderV2()', context) };
 }
 
-test('production and unrelated hosts do not read or mutate the DOM', () => {
-  for (const host of ['www.persybooths.com', 'www.persybooths.co.uk', 'other.webflow.io']) {
+test('UK production and unrelated hosts do not read or mutate the DOM', () => {
+  for (const host of ['www.persybooths.co.uk', 'persybooths.co.uk', 'other.webflow.io']) {
     const env = environment(host, []);
     env.init();
     assert.equal(env.queries(), 0);
@@ -34,12 +34,12 @@ test('production and unrelated hosts do not read or mutate the DOM', () => {
   }
 });
 
-for (const host of ['persybooths-uk.webflow.io', 'persybooths-com-a171e119102a6875fb6aff4.webflow.io']) {
+for (const host of ['www.persybooths.com', 'persybooths.com', 'persybooths-uk.webflow.io', 'persybooths-com-a171e119102a6875fb6aff4.webflow.io']) {
   test(`${host}: legacy pages receive no component listeners`, () => {
     const env = environment(host, []);
     env.init();
     assert.equal(env.queries(), 1);
-    assert.equal(env.context.window.PersyHeaderV2.version, '1.1.0-staging');
+    assert.equal(env.context.window.PersyHeaderV2.version, '1.1.1');
   });
 
   test(`${host}: reinitializing a ready component does not add handlers`, () => {

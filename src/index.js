@@ -625,7 +625,7 @@ function faqAnchorScroll() {
 	});
 }
 
-document.addEventListener("DOMContentLoaded", () => {
+function initSite() {
 	//overlayScrollbar();
 	// gsap.registerPlugin(Draggable);
 	smoothScroll();
@@ -703,4 +703,11 @@ document.addEventListener("DOMContentLoaded", () => {
 		ScrollTrigger.sort();
 		ScrollTrigger.refresh();
 	}, 1000);
-});
+}
+
+// Also support the staging loader when its import finishes after DOMContentLoaded.
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initSite, { once: true });
+} else {
+  initSite();
+}

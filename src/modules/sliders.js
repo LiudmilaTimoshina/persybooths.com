@@ -395,7 +395,8 @@ export function aboutValuesSlider() {
 export function mobileKnowledgeBlogSlider() {
 	const swiperTarget = document.querySelector("[data-knowledge-blog-swiper]");
 
-	if (!swiperTarget) return;
+	// Empty CMS collections omit Swiper's required wrapper.
+	if (!swiperTarget || !swiperTarget.querySelector('.swiper-wrapper')) return;
 
 	const swiper = new Swiper(swiperTarget, {
 		slidesPerView: 1.3,

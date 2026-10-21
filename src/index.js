@@ -323,19 +323,21 @@ function mobileMenuAnimation() {
 	const menuOverlay = mobileMenu.querySelector('[data-mobile-menu="overlay"]');
 	const accordionButtons = document.querySelectorAll('[data-accordion="accordion-item"]');
 
-	let menuOpen = false;
-
 	let mm = gsap.matchMedia();
 
 	mm.add("(max-width: 991px)", () => {
+		let menuOpen = false;
+		const closedLabel = menuTrigger.textContent;
+		const pendingInvalidations = new Set();
 		// Change "auto" height value when accordion is activated for menu animation
-		accordionButtons.forEach((button) => {
-			button.addEventListener("click", () => {
-				setTimeout(() => {
-					menuTl.invalidate();
-				}, 500);
-			});
-		});
+		const invalidateMenu = () => {
+			const timer = setTimeout(() => {
+				pendingInvalidations.delete(timer);
+				menuTl.invalidate();
+			}, 500);
+			pendingInvalidations.add(timer);
+		};
+		accordionButtons.forEach((button) => button.addEventListener("click", invalidateMenu));
 
 		const menuTl = gsap.timeline({
 			paused: true,
@@ -372,7 +374,7 @@ function mobileMenuAnimation() {
 				"<"
 			);
 
-		menuTrigger.addEventListener("click", () => {
+		const toggleMenu = () => {
 			if (!menuOpen) {
 				menuTrigger.textContent = "Close";
 				menuTl.play();
@@ -382,13 +384,24 @@ function mobileMenuAnimation() {
 				menuTl.reverse();
 				menuOpen = false;
 			}
-		});
+		};
 
-		menuOverlay.addEventListener("click", () => {
+		const closeMenu = () => {
 			menuTrigger.textContent = "Menu";
 			menuTl.reverse();
 			menuOpen = false;
-		});
+		};
+		menuTrigger.addEventListener("click", toggleMenu);
+		menuOverlay.addEventListener("click", closeMenu);
+
+		// GSAP reverts its animations; native listeners and timers need explicit cleanup.
+		return () => {
+			menuTrigger.removeEventListener("click", toggleMenu);
+			menuOverlay.removeEventListener("click", closeMenu);
+			accordionButtons.forEach((button) => button.removeEventListener("click", invalidateMenu));
+			pendingInvalidations.forEach((timer) => clearTimeout(timer));
+			menuTrigger.textContent = closedLabel;
+		};
 	});
 }
 

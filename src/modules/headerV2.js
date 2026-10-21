@@ -324,6 +324,45 @@ function initA11y(component) {
 }
 
 
+function initArticleBreadcrumbSpacing(component) {
+  const path = (location.pathname || '').replace(/^\/(de|fr|nl)(?=\/)/, '');
+  if (!/^\/truths-about-booths\/(soundproofing|ventilation|comfort|durability)\/?$/.test(path)) return;
+  if (component.dataset.pbV2BreadcrumbReady === '1') return;
+  const crumbs = component.parentElement?.querySelector(':scope > .breadcrumbs_wrap');
+  const padding = document.querySelector('.main-wrapper .section_article-hero .padding-section-article-hero');
+  if (!crumbs || !padding) return;
+  component.dataset.pbV2BreadcrumbReady = '1';
+  const mobile = matchMedia('(max-width: 767px)');
+  const original = padding.style.getPropertyValue('padding-top');
+  const priority = padding.style.getPropertyPriority('padding-top');
+  let frame = 0;
+  function restore() {
+    if (original) padding.style.setProperty('padding-top', original, priority);
+    else padding.style.removeProperty('padding-top');
+  }
+  function update() {
+    frame = 0;
+    restore();
+    if (!mobile.matches || !crumbs.getClientRects().length) return;
+    const base = parseFloat(getComputedStyle(padding).paddingTop) || 0;
+    const gap = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+    const required = crumbs.getBoundingClientRect().bottom - padding.getBoundingClientRect().top + gap;
+    if (required > base + .5) padding.style.setProperty('padding-top', Math.ceil(required) + 'px');
+  }
+  function schedule() {
+    if (!frame) frame = requestAnimationFrame(update);
+  }
+  if (typeof ResizeObserver !== 'undefined') {
+    const observer = new ResizeObserver(schedule);
+    observer.observe(crumbs);
+    observer.observe(component);
+  }
+  window.addEventListener('resize', schedule);
+  mobile.addEventListener('change', schedule);
+  document.fonts?.ready.then(schedule);
+  schedule();
+}
+
 export function initHeaderV2() {
   if (!ENABLED_HOSTS.has(location.hostname)) return;
   document.querySelectorAll('header[data-pb-header="v2"]').forEach(component => {
@@ -331,6 +370,7 @@ export function initHeaderV2() {
     initLocale(component);
     initFormEscape(component);
     initA11y(component);
+    initArticleBreadcrumbSpacing(component);
   });
   window.PersyHeaderV2 = Object.freeze({ version: '1.1.1', init: initHeaderV2 });
 }

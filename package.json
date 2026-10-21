@@ -6,7 +6,8 @@
 	"scripts": {
 		"build": "esbuild src/index.js --bundle --splitting --format=esm --outdir=dist --entry-names=bundle --chunk-names=chunks/[name]-[hash] --minify",
 		"watch": "esbuild src/index.js --bundle --splitting --format=esm --outdir=dist --entry-names=bundle --chunk-names=chunks/[name]-[hash] --sourcemap --watch",
-		"build:header-v2-staging": "esbuild src/index-staging.js --bundle --splitting --format=esm --outdir=dist/staging/header-v2 --entry-names=bundle --chunk-names=chunks/[name]-[hash] --minify"
+		"build:header-v2-staging": "esbuild src/index-staging.js --bundle --splitting --format=esm --outdir=dist/staging/header-v2 --entry-names=bundle --chunk-names=chunks/[name]-[hash] --minify",
+		"build:header-v2-release": "esbuild src/index-staging.js --bundle --splitting --format=esm --outdir=dist/releases/header-v2 --entry-names=bundle --chunk-names=chunks/[name]-[hash] --minify"
 	},
 	"keywords": [],
 	"author": "",

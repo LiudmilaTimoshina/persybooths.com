@@ -3,6 +3,8 @@ import { gsap } from 'gsap';
 const ENABLED_HOSTS = new Set([
   'www.persybooths.com',
   'persybooths.com',
+  'www.persybooths.co.uk',
+  'persybooths.co.uk',
   'persybooths-uk.webflow.io',
   'persybooths-com-a171e119102a6875fb6aff4.webflow.io',
 ]);
@@ -372,5 +374,5 @@ export function initHeaderV2() {
     initA11y(component);
     initArticleBreadcrumbSpacing(component);
   });
-  window.PersyHeaderV2 = Object.freeze({ version: '1.1.1', init: initHeaderV2 });
+  window.PersyHeaderV2 = Object.freeze({ version: '1.2.0', init: initHeaderV2 });
 }

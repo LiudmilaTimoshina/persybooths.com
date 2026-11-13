@@ -7,6 +7,9 @@ const ENABLED_HOSTS = new Set([
   'persybooths.co.uk',
   'persybooths-uk.webflow.io',
   'persybooths-com-a171e119102a6875fb6aff4.webflow.io',
+  // Designer Preview executes in these separate-origin canvas frames.
+  'persybooths-com-a171e119102a6875fb6aff4.canvas.webflow.com',
+  'persybooths-uk.canvas.webflow.com',
 ]);
 
 function initMenu(component) {
@@ -374,5 +377,5 @@ export function initHeaderV2() {
     initA11y(component);
     initArticleBreadcrumbSpacing(component);
   });
-  window.PersyHeaderV2 = Object.freeze({ version: '1.2.0', init: initHeaderV2 });
+  window.PersyHeaderV2 = Object.freeze({ version: '1.2.1-preview.1', init: initHeaderV2 });
 }

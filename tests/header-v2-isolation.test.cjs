@@ -26,7 +26,7 @@ function environment(hostname, roots) {
 }
 
 test('unrelated hosts do not read or mutate the DOM', () => {
-  for (const host of ['other.webflow.io', 'example.com']) {
+  for (const host of ['other.webflow.io', 'example.com', 'other.canvas.webflow.com', 'persybooths-uk.canvas.webflow.com.example.com']) {
     const env = environment(host, []);
     env.init();
     assert.equal(env.queries(), 0);
@@ -34,12 +34,12 @@ test('unrelated hosts do not read or mutate the DOM', () => {
   }
 });
 
-for (const host of ['www.persybooths.com', 'persybooths.com', 'www.persybooths.co.uk', 'persybooths.co.uk', 'persybooths-uk.webflow.io', 'persybooths-com-a171e119102a6875fb6aff4.webflow.io']) {
+for (const host of ['www.persybooths.com', 'persybooths.com', 'www.persybooths.co.uk', 'persybooths.co.uk', 'persybooths-uk.webflow.io', 'persybooths-com-a171e119102a6875fb6aff4.webflow.io', 'persybooths-com-a171e119102a6875fb6aff4.canvas.webflow.com', 'persybooths-uk.canvas.webflow.com']) {
   test(`${host}: legacy pages receive no component listeners`, () => {
     const env = environment(host, []);
     env.init();
     assert.equal(env.queries(), 1);
-    assert.equal(env.context.window.PersyHeaderV2.version, '1.2.0');
+    assert.equal(env.context.window.PersyHeaderV2.version, '1.2.1-preview.1');
   });
 
   test(`${host}: reinitializing a ready component does not add handlers`, () => {

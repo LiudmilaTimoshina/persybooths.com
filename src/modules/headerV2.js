@@ -110,8 +110,13 @@ function initMenu(component) {
       if (!link || link.matches('[data-accordion="trigger"]')) return;
       if (link.matches('[data-modal-trigger],[data-popup-trigger]') || (link.getAttribute('href') && link.getAttribute('href') !== '#')) close({ immediate: true, restoreFocus: false });
     }, { capture: true });
-    const mediaChange = () => { if (!mq.matches) close({ immediate: true }); };
-    mq.addEventListener('change', mediaChange);
+    on(mq, 'change', event => {
+      // A queued event can describe a desktop transition even after the viewport narrows again.
+      if (!event.matches) close({ immediate: true });
+    });
+    on(window, 'resize', () => {
+      if (opened && !mq.matches) close({ immediate: true });
+    }, { passive: true });
     close({ immediate: true, restoreFocus: false });
 
 }

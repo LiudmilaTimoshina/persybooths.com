@@ -5,7 +5,7 @@ const { resolve } = require('node:path');
 const vm = require('node:vm');
 
 const source = readFileSync(resolve(__dirname, '../src/modules/headerV2.js'), 'utf8')
-  .replace("import { gsap } from 'gsap';", 'const gsap = {};')
+  .replace("import { gsap } from 'gsap';", 'const gsap = window.testGsap || {};')
   .replace('export function initHeaderV2()', 'function initHeaderV2()');
 
 function environment(hostname, roots) {
@@ -32,6 +32,63 @@ test('unrelated hosts do not read or mutate the DOM', () => {
     assert.equal(env.queries(), 0);
     assert.equal(env.context.window.PersyHeaderV2, undefined);
   }
+});
+
+test('compact menu closes when a desktop breakpoint event arrives after returning to compact width', () => {
+  class Element extends EventTarget {
+    attributes = new Map();
+    style = {};
+
+    setAttribute(name, value) { this.attributes.set(name, value); }
+    getAttribute(name) { return this.attributes.get(name); }
+    contains() { return false; }
+  }
+
+  const compact = new EventTarget();
+  compact.matches = true;
+  const trigger = new Element();
+  const panel = new Element();
+  const overlay = new Element();
+  const menu = new Element();
+  menu.querySelector = selector => selector.includes('overlay') ? overlay : panel;
+  menu.getBoundingClientRect = () => ({ height: 0 });
+  const component = {
+    dataset: {},
+    querySelector: selector => selector.startsWith('.mobile-menu') ? menu : {
+      querySelector: () => trigger,
+    },
+  };
+  const window = new EventTarget();
+  window.testGsap = { killTweensOf() {}, to() {}, fromTo() {} };
+  const document = new EventTarget();
+  document.documentElement = { lang: 'en', style: { overflow: 'auto' } };
+  document.body = { style: { overflow: '' } };
+  const context = vm.createContext({
+    component, window, document,
+    matchMedia: query => query.includes('1280px') ? compact : { matches: false },
+  });
+  vm.runInContext(source + '\ninitMenu(component);', context);
+
+  trigger.dispatchEvent(new Event('click'));
+  window.dispatchEvent(new Event('resize'));
+  assert.equal(trigger.getAttribute('aria-expanded'), 'true');
+  assert.equal(document.body.style.overflow, 'hidden');
+
+  // The event recorded entry into desktop before the viewport changed back.
+  compact.dispatchEvent(Object.assign(new Event('change'), { matches: false }));
+  assert.equal(trigger.getAttribute('aria-expanded'), 'false');
+  assert.equal(menu.getAttribute('aria-hidden'), 'true');
+  assert.equal(menu.inert, true);
+  assert.equal(menu.style.display, 'none');
+  assert.equal(document.documentElement.style.overflow, 'auto');
+  assert.equal(document.body.style.overflow, '');
+
+  trigger.dispatchEvent(new Event('click'));
+  assert.equal(trigger.getAttribute('aria-expanded'), 'true');
+  compact.matches = false;
+  window.dispatchEvent(new Event('resize'));
+  assert.equal(trigger.getAttribute('aria-expanded'), 'false');
+  assert.equal(document.body.style.overflow, '');
 });
 
 for (const host of ['www.persybooths.com', 'persybooths.com', 'www.persybooths.co.uk', 'persybooths.co.uk', 'persybooths-uk.webflow.io', 'persybooths-com-a171e119102a6875fb6aff4.webflow.io', 'persybooths-com-a171e119102a6875fb6aff4.canvas.webflow.com', 'persybooths-uk.canvas.webflow.com']) {
